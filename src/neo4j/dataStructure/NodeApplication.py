@@ -6,7 +6,7 @@ from src.neo4j.dataStructure.BaseStructure import BaseStructure
 from src.neo4j.dataStructure.Neo4jError import DataStructureArgumentException
 
 
-class Node(BaseStructure):
+class NodeApplication(BaseStructure, IBaseStructure):
 
     def __init__(self, name: str, category: str | List[str], message: Optional[str] = None, hashValue: Optional[str] = None):
         super().__init__(name, message, hashValue)

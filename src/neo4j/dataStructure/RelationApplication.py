@@ -6,7 +6,7 @@ from src.QuerryCypher.PatternQuerry import PatternQuerry, NodeNeo4j, RelationNeo
 from src.neo4j.dataStructure.Neo4jError import DataStructureArgumentException
 
 
-class Relation(BaseStructure):
+class RelationApplication(BaseStructure, IBaseStructure):
 
     __toCategories: List[str]
     __fromCategories: List[str]
