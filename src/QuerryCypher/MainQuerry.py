@@ -16,7 +16,7 @@ class CreateQuerry:
 
 class MatchQuerry:
 
-    def __init__(self, inputs: List[PatternQuerry | NodeNeo4j], outputs: List[Variable | PropertyNode], where: WhereQuerry = None):
+    def __init__(self, inputs: List[PatternQuerry | NodeNeo4j], outputs: List[Variable | PropertyNode] = [], where: WhereQuerry = None):
 
         self.__inputs: [PatternQuerry | NodeNeo4j] = inputs
         self.__where: WhereQuerry = where
@@ -55,7 +55,7 @@ class MatchQuerry:
     def __str__(self) -> str:
         match: str = f"MATCH {', '.join([str(e) for e in self.__inputs])}\n"
         where: str = f"WHERE({str(self.__where)})\n" if self.__where is not None else ""
-        ret: str = f"RETURN {', '.join([str(e.getName()) for e in self.__outputs])}"
+        ret: str = f"RETURN {', '.join([str(e.getName()) for e in self.__outputs])}" if len(self.__outputs) != 0 else ""
         return f"{match}{where}{ret}"
 
 

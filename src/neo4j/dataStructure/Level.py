@@ -32,7 +32,7 @@ class Level:
 
 class TimeCycle:
 
-    def __init__(self, learningTime: int = c().getUserConfig().getLearningCycle(), nbrStep: int = c().getUserConfig().getLevelMax(), learningCoef=c().getUserConfig().getLearningCoef()):
+    def __init__(self, learningTime: int = c().getUserConfig().getLearningCycle(), learningCoef=c().getUserConfig().getLearningCoef()):
 
         self.__learningTime = learningTime
         self.__learningCoef = learningCoef

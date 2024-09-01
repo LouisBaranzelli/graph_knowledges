@@ -1,4 +1,6 @@
 from typing import List, Optional
+
+from dataStructure.IBaseStructure import IBaseStructure
 from src.QuerryCypher.MainQuerry import CreateQuerry, NodeNeo4j, SetQuerry, DeleteQuerry, MatchQuerry
 from src.QuerryCypher.PatternQuerry import PatternSet, PropertyNode, CypherDate, Variable, PatternQuerry
 from src.common.TimeService import TimeNeo4j
@@ -37,9 +39,4 @@ class NodeApplication(BaseStructure, IBaseStructure):
         variable = Variable('n')
         args = {k: v for k, v in locals().items() if v is not None}
         return str(MatchQuerry([NodeNeo4j(**args)], outputs=[Variable('n')]))
-
-
-if __name__ == '__main__':
-    a = Node(name='louis', category='Personne')
-    print(a.getModifyQuerry(propertyName='name', newValue='pierre'))
 
