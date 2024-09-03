@@ -90,10 +90,27 @@ class CategoryNode:
         return res
 
 
-class CategoryRelation(CategoryNode):
-    def __init__(self, name: str):
-        super().__init__(name)
-        self.setName(StringFunctions.CapitalizeAndRemove_(':' + ':'.join(self.__name) if len(self.__name[0]) > 0 else ""))
+class CategoryRelation:
+    __name: List[str]
+
+    def __init__(self, name: str | List[str]):
+        if isinstance(name, str):
+            self.__name = [name.upper()]
+        else:
+            self.__name = [n.upper() for n in name]
+
+    def getName(self) -> List[str]:
+        return self.__name
+
+    def setName(self, s: str | List[str]):
+        if isinstance(s, str):
+            self.__name = [s.capitalize()]
+        else:
+            self.__name = [n.capitalize() for n in s]
+
+    def __str__(self) -> str:
+        res = ':' + ':'.join(self.__name) if len(self.__name[0]) > 0 else ""
+        return res
 
 
 class Variable:
@@ -120,16 +137,12 @@ class Variable:
 
 class BaseNeo4j:
 
-    def __init__(self, category: str | List[str] = None, variable: str = None, **properties):
+    def __init__(self, variable: str = None, **properties):
         self.__properties: Optional[Properties] = Properties(*[Property(propertiesName, propertiesValue)
                                                                for propertiesName, propertiesValue in
                                                                properties.items()])
 
         self.__variable: Variable = Variable(variable) if variable else Variable("")
-        self.__category: CategoryNode = CategoryNode(category) if category else CategoryNode("")
-
-    def getCategory(self) -> CategoryNode:
-        return self.__category
 
     def getVariable(self) -> Variable:
         return self.__variable
@@ -147,10 +160,15 @@ class NodeNeo4j(BaseNeo4j):
     __properties: Properties | None
 
     def __init__(self, category: str | List[str] = None, variable: str = None, **properties):
-        super().__init__(category, variable, **properties)
+        super().__init__(variable, **properties)
+
+        self.__category: CategoryNode = CategoryNode(category) if category else CategoryNode("")
 
     def __str__(self) -> str:
         return f"({self.getVariable()}{self.getCategory()}{self.getProperties()})"
+
+    def getCategory(self) -> CategoryNode:
+        return self.__category
 
 
 class RelationNeo4j(BaseNeo4j):
@@ -158,12 +176,17 @@ class RelationNeo4j(BaseNeo4j):
     def __init__(self, category: str | List[str] = None, variable: str = None, toRight: bool = False,
                  toLeft: bool = False,
                  **properties):
-        super().__init__(category, variable, **properties)
+        super().__init__(variable, **properties)
+
+        self.__category: CategoryRelation = CategoryRelation(category) if category else CategoryRelation("")
 
         self.__toRight = False
         self.__toLeft = False
         self.setToRight(toRight)
         self.setToLeft(toLeft)
+
+    def getCategory(self) -> CategoryRelation:
+        return self.__category
 
     def setToRight(self, new: bool) -> None:
         self.__toLeft = False if self.__toLeft is True & new is True else self.__toLeft
@@ -264,13 +287,3 @@ class PatternSet:
 
     def __str__(self) -> str:
         return f"{self.__leftMember.getName()} = '{self.__right}'"
-
-
-if __name__ == '__main__':
-    a = NodeNeo4j('personne', age=12, sexe='f')
-    b = RelationNeo4j('lien de parente', taille=12, toLeft=True, variable='b')
-    c = NodeNeo4j('annimal', sexe='m')
-    f = (PatternQuerry(a, b, c))
-
-    g = PropertyNode(a, "age")
-    pass

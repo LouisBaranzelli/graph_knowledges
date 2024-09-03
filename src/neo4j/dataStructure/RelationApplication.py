@@ -13,8 +13,7 @@ from src.neo4j.dataStructure.Neo4jError import DataStructureArgumentException
 
 class RelationApplication(BaseStructure, IBaseStructure):
 
-    __toCategories: List[str]
-    __fromCategories: List[str]
+    __category: str = 'INFORMATION'
 
     def __init__(self, name: str, fromCategory: List[str], toCategory: List[str], message: Optional[str] = None, hashValue: Optional[str] = None, level: int = 0, update: TimeNeo4j = None):
         '''fromCategory and toCategory required to protect the relation creation from wrong elements node'''
@@ -27,9 +26,6 @@ class RelationApplication(BaseStructure, IBaseStructure):
 
     def getFromCategories(self) -> List[str]:
         return self.__fromCategories
-    #
-    # def getOccurrence(self) -> int:
-    #     return self.__occurrence
 
     def getToCategories(self) -> List[str]:
         return self.__toCategories
@@ -42,7 +38,7 @@ class RelationApplication(BaseStructure, IBaseStructure):
         if propertyName not in self.getPropertyNames():
             raise DataStructureArgumentException(f"Invalid property name: {propertyName}.")
 
-        r = RelationNeo4j(variable='r', hash=self.getHashValue())
+        r = RelationNeo4j(category=RelationApplication.__category, variable='r', hash=self.getHashValue())
         return str(SetQuerry([PatternQuerry(NodeNeo4j(), r, NodeNeo4j())], PatternSet(PropertyNode(r, propertyName), newValue)))
 
     @staticmethod
@@ -56,12 +52,12 @@ class RelationApplication(BaseStructure, IBaseStructure):
         propRight = {key: value for key, value in propRight.items() if value not in [None, []]}
         toNode: NodeNeo4j = NodeNeo4j(variable='n2', **propRight)
 
-        p = PatternQuerry(fromNode, RelationNeo4j(variable='r', **kwargs), toNode)
+        p = PatternQuerry(fromNode, RelationNeo4j(category=RelationApplication.__category, variable='r', **kwargs), toNode)
         return str(MatchQuerry(inputs=[p], outputs=[Variable('r')]))
 
     def getCreateQuerry(self, fromNode: NodeApplication = None, toNode: NodeApplication = None) -> str:
         ''' Les noeud doivent avoir ete cree en amont '''
-        r = RelationNeo4j(variable='r', name=self.getName(), message=self.getMessage(),
+        r = RelationNeo4j(category=RelationApplication.__category,variable='r', name=self.getName(), message=self.getMessage(),
                   hashValue=self.getHashValue(), date_creation=CypherDate(TimeNeo4j.getNow().toString()),
                   level=self.__level.getLevel(), update=self.__update.toString(), toRight=True)
 
@@ -72,9 +68,9 @@ class RelationApplication(BaseStructure, IBaseStructure):
         createQuerry:str = str(CreateQuerry(PatternQuerry(NodeNeo4j(variable='n1'), r, NodeNeo4j(variable='n2'))))
         return matchQuerry + createQuerry
 
-    def getDeleteQuerry(self,  fromNode: NodeApplication = None, toNode: NodeApplication = None) -> str:
+    def getDeleteQuerry(self, fromNode: NodeApplication = None, toNode: NodeApplication = None) -> str:
         fromNodeNeo4j: NodeNeo4j = NodeNeo4j(variable='n1', hashValue=fromNode.getHashValue())
         toNodeNeo4j: NodeNeo4j = NodeNeo4j(variable='n2', hashValue=toNode.getHashValue())
 
-        return str(DeleteQuerry([PatternQuerry(fromNodeNeo4j, RelationNeo4j(variable='r'), toNodeNeo4j)], [Variable('r')]))
+        return str(DeleteQuerry([PatternQuerry(fromNodeNeo4j, RelationNeo4j(category=RelationApplication.__category, variable='r', hashValue=self.getHashValue()), toNodeNeo4j)], [Variable('r')]))
         # ecrire le teste + ajouter un teste a la creation de la relation queles typoe concorde si non exception
