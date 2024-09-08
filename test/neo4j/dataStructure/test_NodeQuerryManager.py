@@ -5,12 +5,11 @@ from src.neo4j.dataStructure.NodeApplication import NodeApplication
 
 
 def test_get_create_querry():
-    node = NodeApplication(name='louis', category=['personne', 'garCon'], hashValue='testhash', message='message')
-    assert node.getCreateQuerry() == "CREATE (n:Personne:Garcon{name: 'louis', message: 'message', hash: 'testhash', date_creation: '" + node.getTimeCreation().toString() + "', occurrence: 0.0})"
+    node = NodeQuerryManager(name='louis', category=['personne', 'garCon'], hashValue='testhash', message='message')
+    assert node.getCreateQuerry() == "MERGE (n:Personne:Garcon{hash: 'testhash'})\nON CREATE SET n.name='louis',n.message='message',n.date_creation='" + node.getTimeCreation().toString() + "'"
 
-    node = NodeApplication(name="1", category=[], hashValue='testhash', message='message')
-    assert node.getCreateQuerry() == "CREATE (n{name: '1', message: 'message', hash: 'testhash', date_creation: '" + node.getTimeCreation().toString() + "', occurrence: 0.0})"
-
+    node = NodeQuerryManager(name="1", category=[], hashValue='testhash', message='message')
+    assert node.getCreateQuerry() == "MERGE (n{hash: 'testhash'})\nON CREATE SET n.name='1',n.message='message',n.date_creation='" + node.getTimeCreation().toString() + "'"
 
 def test_get_item_Querry():
     assert NodeApplication.getItemQuerry() == 'MATCH (n)\nRETURN n'
@@ -30,5 +29,5 @@ def test_get_set_querry():
 
 
 def test_get_delete_querry():
-    node = NodeApplication(name='louis', category=['personne'], hashValue='testhash', message='message')
+    node = NodeQuerryManager(name='louis', category=['personne'], hashValue='testhash', message='message')
     assert node.getDeleteQuerry() == "MATCH (n:Personne{hash: 'testhash'})\nDELETE n"

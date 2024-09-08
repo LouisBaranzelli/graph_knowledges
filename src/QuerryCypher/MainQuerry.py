@@ -7,11 +7,14 @@ from src.QuerryCypher.utils import ListUtils
 
 class CreateQuerry:
 
-    def __init__(self, value: [PatternQuerry | NodeNeo4j]):
+    def __init__(self, value: [PatternQuerry | NodeNeo4j], setValue: Union[PatternSet, List[PatternSet]] = None):
         self.__value: [PatternQuerry | NodeNeo4j] = value
+        self.__set: List[PatternSet] = [setValue] if isinstance(setValue, PatternSet) else setValue
 
     def __str__(self) -> str:
-        return f"CREATE {str(self.__value)}"
+        setValue = f"\nON CREATE SET {','.join([ str(s) for s in self.__set])}" if self.__set is not None else ''
+        createValue = f"MERGE {str(self.__value)}"
+        return f"{createValue}{setValue}"
 
 
 class MatchQuerry:

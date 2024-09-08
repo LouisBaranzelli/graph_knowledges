@@ -286,4 +286,4 @@ class PatternSet:
         self.__leftMember: PropertyNode = leftMember
 
     def __str__(self) -> str:
-        return f"{self.__leftMember.getName()} = '{self.__right}'"
+        return f"{self.__leftMember.getName()}='{self.__right}'"
