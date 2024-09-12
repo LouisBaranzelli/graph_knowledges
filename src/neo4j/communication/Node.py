@@ -34,20 +34,40 @@ class Node(IElement, BaseStructure):
     def modify(self, propertyName: str, newValue: str | float) -> 'Node':
         if self.isExist() is False:
             raise DataBaseLogicException(f"Modification impossible. Node: {self.getName()} not existing anymore.")
-        r: List = self.__driver.send(querry=self.__querryManager.getModifyQuerry(propertyName, newValue))
-        return Node(category=list(r[0][0].labels), name=r[0][0].get('name'), message=r[0][0].get('message'),
-                    hashValue=r[0][0].get('hashValue'), date_creation=r[0][0].get('date_creation'), driver=DriverNeo4j.getInstance())
+        self.__driver.send(querry=self.__querryManager.getModifyQuerry(propertyName, newValue))
+        r = Node.getItem(hashValue=self.getHashValue(), driver=self.__driver)
+        if len(r) == 0: DataBaseLogicException(f"Modification not received, may be driver problem.")
+        return r[0]
 
     def getCategory(self) -> List[str]:
         return self.__category
 
     def isExist(self) -> bool:
-        return len(Node.getItem(hashValue=self.getHashValue(), driver=self.__driver)) == 1
+        res = len(Node.getItem(hashValue=self.getHashValue(), driver=self.__driver))
+        if res == 1:
+            return True
+        elif res == 0:
+            return False
+        else: raise DataBaseLogicException(f"Node: {self.getName()} is existing several time.")
+
+    @staticmethod
+    def __deserialization(l: List) -> List['Node']:
+        output = [Node(category=list(r[0].labels), name=r[0].get('name'), message=r[0].get('message'),
+              hashValue=r[0].get('hashValue'), date_creation=r[0].get('date_creation'),
+              driver=DriverNeo4j.getInstance()) for r in l]
+        strResult = "\n".join([str(o) for o in output])
+        LogService().write(f"Deserialisation: got: {l}\nSent: {strResult}", LogLevel.DEBUG)
+        return output
 
     @staticmethod
     def getItem(category: List[str] = [], name: str = None, hashValue: str = None,
                 driver: DriverNeo4j = DriverNeo4j().getInstance()) -> List['Node']:
         querryManagerStatic: NodeQuerryManager = NodeQuerryManager.getStaticInstance()
         results: List = driver.send(querry=querryManagerStatic.getItemQuerry(category, name, hashValue))
-        return [Node(category=list(r[0].labels), name=r[0].get('name'), message=r[0].get('message'),
-                     hashValue=r[0].get('hashValue'), date_creation=r[0].get('date_creation'), driver=DriverNeo4j.getInstance()) for r in results]
+        return Node.__deserialization(results)
+
+    def __str__(self) -> str:
+        return f"category: {self.getCategory()} name: {self.getName()} hashValue: {self.getHashValue()} message: {self.getMessage()} creation: {self.getTimeCreation().toString()}"
+
+
+
