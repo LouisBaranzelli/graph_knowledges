@@ -22,3 +22,7 @@ class DataStructureArgumentException(DataStructureException):
         super().__init__(message, level)
 
 
+class DataBaseLogicException(DataStructureException):
+    def __init__(self, message: str, level: int = 0):
+        message = f"Request failed: {message}"
+        super().__init__(message, level)
