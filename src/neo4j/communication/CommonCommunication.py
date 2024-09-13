@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import List
 
 
 class IElement(ABC):
@@ -24,4 +25,8 @@ class IElement(ABC):
 
     @abstractmethod
     def getItem(self, **kwargs) -> 'IElement':
+        pass
+
+    @abstractmethod
+    def __deserialisation(self, l: List) -> List:
         pass
