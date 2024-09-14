@@ -31,31 +31,25 @@ class LogService:
             __flagInitialized: bool = True
 
     def callbackLogException(self, e: Exception):
-        self.write(str(e), LogLevel.ERROR)
+        self.debug(str(e), LogLevel.ERROR)
 
-    def write(self, message: str, level: LogLevel = 'DEBUG'):
-        if level == LogLevel.DEBUG:
-            logger.debug(message)
+    def debug(self, message: str):
+        logger.debug(message)
 
-        if level == LogLevel.INFO:
-            logger.info(message)
+    def info(self, message: str):
+        logger.info(message)
 
-        if level == LogLevel.WARNING:
-            logger.warning(message)
+    def debug(self, message: str):
+        logger.warning(message)
 
-        if level == LogLevel.ERROR:
-            logger.error(message)
+    def debug(self, message: str):
+        logger.error(message)
 
-        if level == LogLevel.CRITICAL:
-            logger.critical(message)
+    def debug(self, message: str):
+        logger.critical(message)
 
     def __new__(cls, *args, **kwargs):
         if cls.__instance is None:
             cls.__instance = super().__new__(cls)
 
         return cls.__instance
-
-
-if __name__ == '__main__':
-    my_logger = LogService()
-    my_logger.write('salut', LogLevel.INFO)

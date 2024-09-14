@@ -22,7 +22,7 @@ class DriverNeo4j:
     def send(self, querry: str) -> List:
         session = self.__driver.session(database=self.__database)
         try:
-            LogService().write(querry, level=LogLevel.DEBUG)
+            LogService().debug(querry)
             return session.run(querry).values()
         finally:
             session.close()

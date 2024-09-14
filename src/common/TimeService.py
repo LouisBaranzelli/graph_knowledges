@@ -25,5 +25,5 @@ class TimeNeo4j():
     def __new__(cls, year: int = 0, month: int = 0, day: int = 0, hour: int = 0, minute: int = 0, timeFormat: str = '%d/%m/%Y'):
         if TimeNeo4j.__format is None:
             TimeNeo4j.__format = timeFormat
-            LogService().write(f"Date format: {cls.__format}.", level=LogLevel.INFO)
+            LogService().debug(f"Date format: {cls.__format}.")
         return super().__new__(cls)

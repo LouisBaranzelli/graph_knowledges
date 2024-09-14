@@ -56,7 +56,7 @@ class Node(IElement, BaseStructure):
               hashValue=r[0].get('hashValue'), date_creation=r[0].get('date_creation'),
               driver=DriverNeo4j.getInstance()) for r in l]
         strResult = "\n".join([str(o) for o in output])
-        LogService().write(f"Deserialisation: got: {l}\nSent: {strResult}", LogLevel.DEBUG)
+        LogService().debug(f"Deserialisation: got: {l}\nSent: {strResult}")
         return output
 
     @staticmethod

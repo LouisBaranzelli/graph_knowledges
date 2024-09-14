@@ -39,7 +39,7 @@ class TimeCycle:
 
     def __getNextStepInDays(self, l: int, n: int) -> int:
         if l > n:
-            LogService().write(f"Not step should be > than level, got: step: {n} and level: {l}. Return no change.", LogLevel.WARNING)
+            LogService().warning(f"Not step should be > than level, got: step: {n} and level: {l}. Return no change.")
             return 0
         return math.ceil(self.__learningTime / (self.__learningCoef**(n-l)))
 
