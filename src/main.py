@@ -17,7 +17,7 @@ class Main:
         self.logger: LogService = None
 
         self.initialize()
-        self.logger.write("Demmarage", LogLevel.INFO)
+        self.logger.info("Demmarage")
 
         try:
 
