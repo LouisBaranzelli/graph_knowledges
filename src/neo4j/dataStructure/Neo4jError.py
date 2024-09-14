@@ -10,9 +10,9 @@ class DataStructureException(ApplicationException):
 
 
 class DataStructureExceptionException(DataStructureException):
-    def __init__(self, elements: List[List[str]],  message: str, level: int = 0):
+    def __init__(self, elements: List[List[str]], message: str, level: int = 0):
         messages: list[str] = []
-        [messages.append("["+' ,'.join([str(element_) for element_ in element])+"]") for element in elements]
+        [messages.append("[" + ' ,'.join([str(element_) for element_ in element]) + "]") for element in elements]
         message = f"{' AND '.join(messages)} not Compatible. {message}"
         super().__init__(message, level)
 

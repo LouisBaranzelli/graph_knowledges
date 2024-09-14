@@ -1,7 +1,7 @@
 from datetime import datetime
 from src.neo4j.dataStructure.BaseStructure import BaseStructure
 from src.neo4j.dataStructure.Relation import Relation
-from src.neo4j.dataStructure.Node import Node
+from communication.Node import Node
 from src.neo4j.dataStructure.Neo4jError import DataStructureExceptionException
 
 
@@ -26,12 +26,6 @@ class NodesRelation(BaseStructure):
 
     def getCompteur(self) -> int:
         return self.__compteur
-
-if __name__ == '__main__':
-    relation = Relation('louis', ['Personne', 'animal'], ['Personnes'])
-    node1 = Node('louis', ['Personne', 'ANimal'])
-    node2 = Node('louis', 'Personne')
-    a = NodesRelation(node1, relation, node2)
 
 
 

@@ -1,7 +1,7 @@
 import pytest
 
 from src.neo4j.dataStructure.Neo4jError import DataStructureArgumentException
-from src.neo4j.dataStructure.NodeApplication import NodeApplication
+from src.neo4j.dataStructure.NodeQuerryManager import NodeQuerryManager
 
 
 def test_get_create_querry():
@@ -12,15 +12,15 @@ def test_get_create_querry():
     assert node.getCreateQuerry() == "MERGE (n{hash: 'testhash'})\nON CREATE SET n.name='1',n.message='message',n.date_creation='" + node.getTimeCreation().toString() + "'"
 
 def test_get_item_Querry():
-    assert NodeApplication.getItemQuerry() == 'MATCH (n)\nRETURN n'
-    assert NodeApplication.getItemQuerry(category=['personne'], name='louis',
-                                         hashValue='testhash') == "MATCH (n:Personne{name: 'louis', hashValue: 'testhash'})\nRETURN n"
+    assert NodeQuerryManager.getItemQuerry() == 'MATCH (n)\nRETURN n'
+    assert NodeQuerryManager.getItemQuerry(category=['personne'], name='louis',
+                                           hashValue='testhash') == "MATCH (n:Personne{name: 'louis', hashValue: 'testhash'})\nRETURN n"
 
 
 def test_get_set_querry():
-    node = NodeApplication(name='louis', category=['personne'], hashValue='testhash', message='message')
+    node = NodeQuerryManager(name='louis', category=['personne'], hashValue='testhash', message='message')
     assert node.getModifyQuerry(propertyName='name',
-                                newValue='pierre') == "MATCH (n{hash: 'testhash'})\nSET n.name = 'pierre'"
+                                newValue='pierre') == "MATCH (n{hash: 'testhash'})\nSET n.name='pierre'\nRETURN n"
     with pytest.raises(DataStructureArgumentException):
         node.getModifyQuerry(propertyName='hashValue', newValue='pierre')
     with pytest.raises(DataStructureArgumentException):

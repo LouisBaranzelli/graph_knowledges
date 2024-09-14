@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 from src.QuerryCypher.CypherException import QuerryException
 from src.QuerryCypher.WhereQuerry import WhereQuerry, ConditionalPattern
 from src.QuerryCypher.PatternQuerry import NodeNeo4j, PatternQuerry, Variable, PropertyNode, PatternSet
