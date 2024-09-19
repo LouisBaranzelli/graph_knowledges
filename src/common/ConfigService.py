@@ -1,7 +1,6 @@
 import json
 from typing import Dict, Type, Set
 
-from src.common.ApplicationException import ApplicationException
 from src.utils.Constant import CONFIG_PATH
 from src.common.LogService import LogService, LogLevel
 
@@ -16,21 +15,20 @@ class Parameter():
         self.__max: float | int = max
         self.set(value)
 
-
     def set(self, v: object) -> bool:
 
         if not isinstance(v, self.__classAutorized):
-            LogService().write(f'Wrong instance. Expected{self.__classAutorized}, got {type(v)}')
+            LogService().debug(f'Wrong instance. Expected{self.__classAutorized}, got {type(v)}')
             return False
 
-        if isinstance(v,(int, float)):
+        if isinstance(v, (int, float)):
             if self.__max is not None:
                 if v > self.__max:
-                    LogService().write(f'Wrong value. Max: {self.__max}, got {v}')
+                    LogService().debug(f'Wrong value. Max: {self.__max}, got {v}')
                     self.__value = self.__max
                     return False
                 if v < self.__min:
-                    LogService().write(f'Wrong value. Min: {self.__min}, got {v}')
+                    LogService().debug(f'Wrong value. Min: {self.__min}, got {v}')
                     self.__value = self.__min
                     return False
 
@@ -41,15 +39,10 @@ class Parameter():
         return self.__value
 
 
-
-
-
-
 class BaseConfig:
 
     def __init__(self, **kwargs):
-
-        [LogService().write(f"Argument non autorisé : {key}", LogLevel.WARNING) for key in kwargs]
+        [LogService().debug(f"Argument non autorisé : {key}", LogLevel.WARNING) for key in kwargs]
 
         # if not all([requiredKey in kwargs for requiredKey in allowed_args]):
         #     raise ApplicationException(f'Missing argument in config file: {[requiredKey for requiredKey in allowed_args  if requiredKey not in kwargs]}')
@@ -58,14 +51,12 @@ class BaseConfig:
 class UserConfig(BaseConfig):
 
     def __init__(self, learningCycle: int = 180, levelMax: int = 10, learningCoef=1.7, **kwargs):
-
         super().__init__(**kwargs)
 
         self.__levelMax: Parameter = Parameter(levelMax, classAutorized=int, min=1, max=20)
         self.__learningCoef: Parameter = Parameter(learningCoef, classAutorized=float, min=1.5, max=2.5)
-        minLearningCycle = (learningCoef+1)**self.__levelMax.get()
+        minLearningCycle = (learningCoef + 1) ** self.__levelMax.get()
         self.__learningCycle: Parameter = Parameter(learningCycle, classAutorized=int, min=minLearningCycle)
-
 
     def getLevelMax(self) -> int:
         return self.__levelMax.get()
@@ -75,8 +66,6 @@ class UserConfig(BaseConfig):
 
     def getLearningCoef(self) -> float:
         return self.__learningCoef.get()
-
-
 
 
 class ConfigService:
