@@ -49,31 +49,29 @@ class RelationQuerryManager(BaseStructure, IQuerryManager):
         p = PatternQuerry(fromNode, RelationNeo4j(category=RelationQuerryManager.__category, variable='r', **kwargs), toNode)
         return str(MatchQuerry(inputs=[p], outputs=[Variable('r')]))
 
-    def getCreateQuerry(self, fromNode: NodeQuerryManager = None, toNode: NodeQuerryManager = None) -> str:
-        ''' Les noeud doivent avoir ete cree en amont '''
+    def getCreateQuerry(self) -> str:
+        
+        if not all([f in self.__fromNode.getCategories() for f in self.__relation.getFromCategory()]):
+            raise DataStructureArgumentException(f"Left node {self.__fromNode.getCategories()} doesn't match with the expected category of the relation: {self.__relation.getFromCategory()}.")
+        if not all([t in self.__toNode.getCategories() for t in self.__relation.getToCategory()]):
+            raise DataStructureArgumentException(f"Right node {self.__toNode.getCategories()} doesn't match with the expected category of the relation: {self.__relation.getToCategory()}.")
 
-        if not all([f in fromNode.getCategories() for f in self.__fromCategories]):
-            raise DataStructureArgumentException(f"Left node {fromNode.getCategories()} doesn't match with the expected category of the relation: {self.__fromCategories}.")
-        if not all([t in toNode.getCategories() for t in self.__toCategories]):
-            raise DataStructureArgumentException(f"Right node {toNode.getCategories()} doesn't match with the expected category of the relation: {self.__toCategories}.")
+        r = RelationNeo4j(category=InformationQuerryManager.__category, variable='r',
+                          hashValue=self.__relation.getHashValue(), date_creation=self.getDateCreation().toString(),
+                          level=self.__level.getLevel(), updateTime=TimeCycle().getNextStep(self.__level).toString(), toRight=True)
 
-        r = RelationNeo4j(category=RelationQuerryManager.__category, variable='r', name=self.getName(), message=self.getMessage(),
-                          hashValue=self.getHashValue(), date_creation=CypherDate(TimeNeo4j.getNow().toString()),
-                          level=self.__level.getLevel(), update=self.__update.toString(), toRight=True)
-
-        fromNodeNeo4j: NodeNeo4j = NodeNeo4j(variable='n1', hashValue=fromNode.getHashValue())
-        toNodeNeo4j: NodeNeo4j = NodeNeo4j(variable='n2', hashValue=toNode.getHashValue())
+        fromNodeNeo4j: NodeNeo4j = NodeNeo4j(variable='n1', hashValue=self.__fromNode.getHashValue())
+        toNodeNeo4j: NodeNeo4j = NodeNeo4j(variable='n2', hashValue=self.__toNode.getHashValue())
 
         matchQuerry: str = str(MatchQuerry(inputs=[fromNodeNeo4j, toNodeNeo4j]))
         createQuerry:str = str(CreateQuerry(PatternQuerry(NodeNeo4j(variable='n1'), r, NodeNeo4j(variable='n2'))))
         return matchQuerry + createQuerry
 
-    def getDeleteQuerry(self, fromNode: NodeQuerryManager = None, toNode: NodeQuerryManager = None) -> str:
-        fromNodeNeo4j: NodeNeo4j = NodeNeo4j(variable='n1', hashValue=fromNode.getHashValue())
-        toNodeNeo4j: NodeNeo4j = NodeNeo4j(variable='n2', hashValue=toNode.getHashValue())
+    def getLevel(self) -> Level:
+        return self.__level
 
-        return str(DeleteQuerry([PatternQuerry(fromNodeNeo4j, RelationNeo4j(category=RelationQuerryManager.__category, variable='r', hashValue=self.getHashValue()), toNodeNeo4j)], [Variable('r')]))
-        # ecrire le teste + ajouter un teste a la creation de la relation queles typoe concorde si non exception
+    def getRelation(self) -> Relation:
+        return self.__relation
 
     def getDateCreation(self) -> TimeNeo4j:
         return self.__dateCreation
