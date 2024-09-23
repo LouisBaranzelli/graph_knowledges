@@ -6,10 +6,10 @@ from src.neo4j.dataStructure.NodeQuerryManager import NodeQuerryManager
 
 def test_get_create_querry():
     node = NodeQuerryManager(name='louis', category=['personne', 'garCon'], hashValue='testhash', message='message')
-    assert node.getCreateQuerry() == "MERGE (n:Personne:Garcon{hash: 'testhash'})\nON CREATE SET n.name='louis',n.message='message',n.date_creation='" + node.getTimeCreation().toString() + "'"
+    assert node.getCreateQuerry() == "MERGE (n:Personne:Garcon{hash: 'testhash'})\nON CREATE SET n.name='louis',n.message='message',n.date_creation='" + node.getDateCreation().toString() + "'"
 
     node = NodeQuerryManager(name="1", category=[], hashValue='testhash', message='message')
-    assert node.getCreateQuerry() == "MERGE (n{hash: 'testhash'})\nON CREATE SET n.name='1',n.message='message',n.date_creation='" + node.getTimeCreation().toString() + "'"
+    assert node.getCreateQuerry() == "MERGE (n{hash: 'testhash'})\nON CREATE SET n.name='1',n.message='message',n.date_creation='" + node.getDateCreation().toString() + "'"
 
 def test_get_item_Querry():
     assert NodeQuerryManager.getItemQuerry() == 'MATCH (n)\nRETURN n'

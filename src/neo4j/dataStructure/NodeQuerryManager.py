@@ -22,10 +22,11 @@ class NodeQuerryManager(BaseStructure, IQuerryManager):
 
     def getCreateQuerry(self) -> str:
 
-        node = NodeNeo4j(category=self.__categories, variable='n', name=self.getName(), message=self.getMessage(), hash=self.getHashValue(), date_creation=CypherDate(self.getTimeCreation().toString()))
+        node = NodeNeo4j(category=self.__categories, variable='n', name=self.getName(), message=self.getMessage(), hash=self.getHashValue(), date_creation=CypherDate(self.getDateCreation().toString()))
+        # setParameter wont block to overwrite an existing value of the Node on the DB even if different
         setParameter = [PatternSet(PropertyNode(node, 'name'), self.getName()),
                         PatternSet(PropertyNode(node, 'message'), self.getMessage()),
-                        PatternSet(PropertyNode(node, 'date_creation'), self.getTimeCreation().toString())
+                        PatternSet(PropertyNode(node, 'date_creation'), self.getDateCreation().toString())
                         ]
         return str(CreateQuerry(value=NodeNeo4j(category=self.__categories, variable='n', hashValue=self.getHashValue()), setValue=setParameter))
 

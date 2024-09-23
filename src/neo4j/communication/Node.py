@@ -67,7 +67,7 @@ class Node(IElement, BaseStructure):
         return Node.__deserialization(results)
 
     def __str__(self) -> str:
-        return f"category: {self.getCategory()} name: {self.getName()} hashValue: {self.getHashValue()} message: {self.getMessage()} creation: {self.getTimeCreation().toString()}"
+        return f"category: {self.getCategory()} name: {self.getName()} hashValue: {self.getHashValue()} message: {self.getMessage()} creation: {self.getDateCreation().toString()}"
 
 
 

@@ -1,5 +1,6 @@
 from typing import List, Optional
 
+from communication.Relation import Relation
 from dataStructure.IQuerryManager import IQuerryManager
 from dataStructure.Level import Level, TimeCycle
 from dataStructure.NodeQuerryManager import NodeQuerryManager
@@ -15,38 +16,31 @@ class RelationQuerryManager(BaseStructure, IQuerryManager):
 
     __category: str = 'INFORMATION'
 
-    def __init__(self, name: str, fromCategory: List[str], toCategory: List[str], message: Optional[str] = None, hashValue: Optional[str] = None, level: int = 0, update: TimeNeo4j = None):
-        '''fromCategory and toCategory required to protect the relation creation from wrong elements node'''
-        super().__init__(name, message, hashValue)
-        self.__fromCategories: List[str] = [fromCategory.capitalize()] if isinstance(fromCategory, str) else [element.capitalize() for element in fromCategory]
-        self.__toCategories: List[str] = [] if toCategory is None else [toCategory] if isinstance(toCategory, str) else [element.capitalize() for element in toCategory]
-        self.__level: Level = Level(level)
-        self.__update: TimeNeo4j = TimeCycle().getNextStep(self.__level) if update is None else update
-        [self.getPropertyNames().append(e) for e in ['update', 'level']]
-
-    def getFromCategories(self) -> List[str]:
-        return self.__fromCategories
-
-    def getToCategories(self) -> List[str]:
-        return self.__toCategories
+    def __init__(self, relation: Relation, fromNode: NodeQuerryManager = None, toNode: NodeQuerryManager = None, level: Level = None, dateCreation: str = None):
+        # ajouter IQuerryManager
+        self.__level = Level() if level is None else level
+        self.__dateCreation: TimeNeo4j = TimeNeo4j.getNow() if dateCreation is None else TimeNeo4j.fromString(dateCreation)
+        self.__relation: Relation = relation
+        self.__propertyNames = ['level', 'dateCreation']
+        self.__fromNode: NodeQuerryManager = fromNode
+        self.__toNode: NodeQuerryManager = toNode
+        # pas de hash Value pour l'information (seulement pour la Relation general),
+        # car information peut etre identifiee par les hashs des noeuds
 
     def getModifyQuerry(self, propertyName: str, newValue: str | float) -> str:
-        #TODO Verifier si les relation d'un meme Hash partagent toutes les memes caracteristiques, dans le cas contraire, identifier les relation par les noeuds from et to
+
         if propertyName == "hashValue":
             raise DataStructureArgumentException("Impossible to modify hashValue")
 
-        if propertyName not in self.getPropertyNames():
+        if propertyName not in self.__propertyNames:
             raise DataStructureArgumentException(f"Invalid property name: {propertyName}.")
 
-        r = RelationNeo4j(category=RelationQuerryManager.__category, variable='r', hash=self.getHashValue())
-        return str(SetQuerry([PatternQuerry(NodeNeo4j(), r, NodeNeo4j())], PatternSet(PropertyNode(r, propertyName), newValue)))
+        fromNode: NodeNeo4j = NodeNeo4j(hashValue=self.__fromNode.getHashValue())
+        toNode: NodeNeo4j = NodeNeo4j(hashValue=self.__toNode.getHashValue())
 
-    @staticmethod
-    def getItemQuerry(fromNodeHash: str = None, fromCategory: List[str] = [], toNodeHash: str = None, toCategory: List[str] = [], **kwargs) -> str:
-
-        propLeft = {'hashValue': fromNodeHash, 'category': fromCategory}
-        propLeft = {key: value for key, value in propLeft.items() if value not in [None, []]}
-        fromNode: NodeNeo4j = NodeNeo4j(variable='n1', **propLeft)
+        r: RelationNeo4j = RelationNeo4j(category=InformationQuerryManager.__category, variable='r')
+        p: PatternQuerry = PatternQuerry(fromNode, r, toNode)
+        return str(SetQuerry([p], PatternSet(PropertyNode(r, propertyName), newValue)))
 
         propRight = {'hashValue': toNodeHash, 'category': toCategory}
         propRight = {key: value for key, value in propRight.items() if value not in [None, []]}
@@ -81,6 +75,5 @@ class RelationQuerryManager(BaseStructure, IQuerryManager):
         return str(DeleteQuerry([PatternQuerry(fromNodeNeo4j, RelationNeo4j(category=RelationQuerryManager.__category, variable='r', hashValue=self.getHashValue()), toNodeNeo4j)], [Variable('r')]))
         # ecrire le teste + ajouter un teste a la creation de la relation queles typoe concorde si non exception
 
-    @staticmethod
-    def getStaticInstance() -> 'IQuerryManager':
-        pass
+    def getDateCreation(self) -> TimeNeo4j:
+        return self.__dateCreation

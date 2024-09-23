@@ -16,14 +16,14 @@ class BaseStructure:
         self.__hashValue: str = str(uuid.uuid4() if hashValue is None else hashValue)
         self.__name: str = name
         self.__message: str = message or ''
-        self.__timeCreation: TimeNeo4j = TimeNeo4j.getNow() if dateCreation is None else TimeNeo4j.fromString(dateCreation)
-        self.__propertyNames = ['hashValue', 'message', 'timeCreation', 'name']
+        self.__dateCreation: TimeNeo4j = TimeNeo4j.getNow() if dateCreation is None else TimeNeo4j.fromString(dateCreation)
+        self.__propertyNames = ['hashValue', 'message', 'dateCreation', 'name']
 
     def getHashValue(self) -> str:
         return self.__hashValue
 
-    def getTimeCreation(self) -> TimeNeo4j:
-        return self.__timeCreation
+    def getDateCreation(self) -> TimeNeo4j:
+        return self.__dateCreation
 
     def getName(self) -> str:
         return self.__name
