@@ -53,48 +53,15 @@ class TestRelation:
             information.getModifyQuerry(propertyName='hashValue', newValue='pierre')
         with pytest.raises(DataStructureArgumentException):
             information.getModifyQuerry(propertyName='means_no_thing', newValue='pierre')
-    # #
-    # def test_getItem(self):
-    #     InformationQuerryManager.getItemQuerry(fromNodeHash='toto', toNodeHash='tata')
-    #     assert InformationQuerryManager.getItemQuerry(fromNodeHash='toto',
-    #                                                toNodeHash='tata') == "MATCH (n1{hashValue: 'toto'})-[r:INFORMATION]-(n2{hashValue: 'tata'})\nRETURN r"
-    #     assert InformationQuerryManager.getItemQuerry(
-    #         fromNodeHash='toto') == "MATCH (n1{hashValue: 'toto'})-[r:INFORMATION]-(n2)\nRETURN r"
-    #     assert InformationQuerryManager.getItemQuerry() == "MATCH (n1)-[r:INFORMATION]-(n2)\nRETURN r"
-    #     assert InformationQuerryManager.getItemQuerry(hashValue='titi') == "MATCH (n1)-[r:INFORMATION{hashValue: 'titi'}]-(n2)\nRETURN r"
-    #     assert InformationQuerryManager.getItemQuerry(hashValue='titi',
-    #                                                name='louis') == "MATCH (n1)-[r:INFORMATION{hashValue: 'titi', name: 'louis'}]-(n2)\nRETURN r"
-    #     assert InformationQuerryManager.getItemQuerry(hashValue='titi',
-    #                                                fromCategory=['chien', 'chat'],
-    #                                                name='louis') == "MATCH (n1:Chien:Chat)-[r:INFORMATION{hashValue: 'titi', name: 'louis'}]-(n2)\nRETURN r"
-    #     assert InformationQuerryManager.getItemQuerry(hashValue='titi',
-    #                                                fromCategory=['chien', 'chat'],
-    #                                                toCategory=['renard'],
-    #                                                toNodeHash='coco',
-    #                                                name='louis') == "MATCH (n1:Chien:Chat)-[r:INFORMATION{hashValue: 'titi', name: 'louis'}]-(n2:Renard{hashValue: 'coco'})\nRETURN r"
-    #
-    # def test_create(self):
-    #     r = InformationQuerryManager(name='louis', level=1, message='nouvelle relation', fromCategory=['person'],
-    #                               toCategory=['person'], hashValue='loulou')
-    #     n1 = NodeQuerryManager(hashValue='toto', category='person', name='harry')
-    #     n2 = NodeQuerryManager(hashValue='titi', category='person', name='jean')
-    #     uptimeStr = TimeCycle().getNextStep(Level(1)).toString()
-    #     assert r.getCreateQuerry(fromNode=n1,
-    #                              toNode=n2) == "MATCH (n1{hashValue: 'toto'}), (n2{hashValue: 'titi'})\nMERGE (n1)-[r:INFORMATION{name: 'louis', message: 'nouvelle relation', hashValue: 'loulou', date_creation: '" + TimeNeo4j.getNow().toString() + "', level: 1.0, update: '" + uptimeStr + "'}]->(n2)"
-    #     n1 = NodeQuerryManager(hashValue='toto', category='chien', name='harry')
-    #     with pytest.raises(DataStructureArgumentException):
-    #         r.getCreateQuerry(fromNode=n1, toNode=n2)
-    #     n1 = NodeQuerryManager(hashValue='toto', category='person', name='harry')
-    #     n2 = NodeQuerryManager(hashValue='titi', category='chat', name='jean')
-    #     with pytest.raises(DataStructureArgumentException):
-    #         r.getCreateQuerry(fromNode=n1, toNode=n2)
-    #
-    #
-    #
-    # def test_delete(self):
-    #     r = InformationQuerryManager(name='louis', level=1, message='nouvelle relation', fromCategory=['person'],
-    #                               toCategory=['persom'], hashValue='loulou')
-    #     n1 = NodeQuerryManager(hashValue='titi', category='person', name='harry')
-    #     n2 = NodeQuerryManager(hashValue='toto', category='person', name='jean')
-    #     assert r.getDeleteQuerry(
-    #         fromNode=n1, toNode=n2) == "MATCH (n1{hashValue: 'titi'})-[r:INFORMATION{hashValue: 'loulou'}]-(n2{hashValue: 'toto'})\nDELETE r"
+
+    def test_delete(self, relation, nodeAFixture, nodeBFixture):
+        information: InformationQuerryManager = InformationQuerryManager(relation=relation, fromNode=nodeAFixture,
+                                                                         toNode=nodeBFixture)
+        assert information.getDeleteQuerry() == "MATCH (n1{hashValue: 'titi'})-[r:INFORMATION]-(n2{hashValue: 'toto'})\nDELETE r"
+
+    def test_getItem(self, nodeAFixture, nodeBFixture):
+        InformationQuerryManager.getItemQuerry(fromNodeHash='toto', toNodeHash='tata')
+        assert InformationQuerryManager.getItemQuerry(fromNodeHash='toto', toNodeHash='tata') == "MATCH (n1{hashValue: 'toto'})-[r:INFORMATION]-(n2{hashValue: 'tata'})\nRETURN r"
+        assert InformationQuerryManager.getItemQuerry(
+            fromNodeHash='toto') == "MATCH (n1{hashValue: 'toto'})-[r:INFORMATION]-(n2)\nRETURN r"
+        assert InformationQuerryManager.getItemQuerry() == "MATCH (n1)-[r:INFORMATION]-(n2)\nRETURN r"
