@@ -54,7 +54,7 @@ class InformationQuerryManager(IQuerryManager):
         propRight = {key: value for key, value in propRight.items() if value not in [None, []]}
         toNode: NodeNeo4j = NodeNeo4j(variable='n2', **propRight)
 
-        r: RelationNeo4j = RelationNeo4j(category=InformationQuerryManager.__category, variable='r')
+        r: RelationNeo4j = RelationNeo4j(category=InformationQuerryManager.__category, variable='r', toRight=True)
 
         p = PatternQuerry(fromNode, r , toNode)
         return str(MatchQuerry(inputs=[p], outputs=[Variable('r')]))
@@ -90,7 +90,7 @@ class InformationQuerryManager(IQuerryManager):
 
     @staticmethod
     def getStaticInstance() -> 'IQuerryManager':
-        pass
+        return InformationQuerryManager(Relation([],[],''), fromNode=NodeQuerryManager.getStaticInstance(), toNode=NodeQuerryManager.getStaticInstance())
 
     def getLevel(self) -> Level:
         return self.__level
