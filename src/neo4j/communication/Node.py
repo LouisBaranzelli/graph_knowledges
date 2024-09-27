@@ -69,5 +69,10 @@ class Node(IElement, BaseStructure):
     def __str__(self) -> str:
         return f"category: {self.getCategory()} name: {self.getName()} hashValue: {self.getHashValue()} message: {self.getMessage()} creation: {self.getDateCreation().toString()}"
 
+    def getQuerryManager(self) -> NodeQuerryManager:
+        return self.__querryManager
+
+    def setQuerryManager(self, q: IQuerryManager) -> None:
+        self.__querryManager = q
 
 
