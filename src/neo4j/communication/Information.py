@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Optional, List
+from typing import Optional, List, Tuple
 
 from communication.CommonCommunication import IElement
 from communication.Node import Node
@@ -35,6 +35,9 @@ class Information(IElement):
         if self.isExist():
             raise DataBaseLogicException(f"Creation impossible. Relation: {self.__relation.getName()} between {self.__fromNode.getName()} and {self.__toNode.getName()} already existing.")
 
+        if self.__relation.isExist() is False: # update the meta library of the existing relation
+            self.__relation.create()
+
         self.__driver.send(querry=self.__querryManager.getCreateQuerry())
 
     def delete(self, **kwargs) -> None:
@@ -54,10 +57,14 @@ class Information(IElement):
 
     @staticmethod
     def getItem(driver: DriverNeo4j = DriverNeo4j.getInstance(), fromNodeHash: str = None, fromCategory: List[str] = [],
-                toNodeHash: str = None, toCategory: List[str] = []) -> List:
+                toNodeHash: str = None, toCategory: List[str] = [], relationHash: str = None) -> List:
         querryManagerStatic: InformationQuerryManager = InformationQuerryManager.getStaticInstance()
         output: List = driver.send(
-            querryManagerStatic.getItemQuerry(fromNodeHash, fromCategory, toNodeHash, toCategory))
+            querryManagerStatic.getItemQuerry(fromNodeHash, fromCategory, toNodeHash, toCategory, relationHash))
+
+        for o in output:
+           a = Information.__deserializeRelation(o)
+
         return output
 
     @staticmethod
@@ -66,6 +73,21 @@ class Information(IElement):
         #                hashValue=r[0].get('hashValue'), date_creation=r[0].get('date_creation'),
         #                driver=DriverNeo4j.getInstance()) for r in l]
         # strResult = "\n".join([str(o) for o in output])
+
+
+    @staticmethod
+    def __deserializeNode(l: List) -> Tuple[Node, Node]:
+        fromNode: Node = Node.deserialization([[l[0]]])[0]
+        toNode: Node = Node.deserialization([[l[2]]])[0]
+        return fromNode, toNode
+
+    @staticmethod
+    def __deserializeRelation(l: List) -> Relation:
+        hashRelation: str = l[1]._properties['hashValue']
+        if len(Relation.getItem(hashValue=hashRelation, driver=DriverNeo4j.getInstance())) != 1:
+            assert DataBaseLogicException(f'The relation with the hash {hashRelation} is used but the meta relation does not exist.')
+        return Relation.getItem(hashValue=hashRelation, driver=DriverNeo4j.getInstance())[0]
+
         # LogService().debug(f"Deserialisation: got: {l}\nSent: {strResult}")
         # return output
         return []

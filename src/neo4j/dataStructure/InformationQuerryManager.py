@@ -44,7 +44,7 @@ class InformationQuerryManager(IQuerryManager):
         return str(SetQuerry([p], PatternSet(PropertyNode(r, propertyName), newValue)))
 
     @staticmethod
-    def getItemQuerry(fromNodeHash: str = None, fromCategory: List[str] = [], toNodeHash: str = None, toCategory: List[str] = [], **kwargs) -> str:
+    def getItemQuerry(fromNodeHash: str = None, fromCategory: List[str] = [], toNodeHash: str = None, toCategory: List[str] = [], relationHash: str = None) -> str:
 
         propLeft = {'hashValue': fromNodeHash, 'category': fromCategory}
         propLeft = {key: value for key, value in propLeft.items() if value not in [None, []]}
@@ -54,10 +54,13 @@ class InformationQuerryManager(IQuerryManager):
         propRight = {key: value for key, value in propRight.items() if value not in [None, []]}
         toNode: NodeNeo4j = NodeNeo4j(variable='n2', **propRight)
 
-        r: RelationNeo4j = RelationNeo4j(category=InformationQuerryManager.__category, variable='r', toRight=True)
+        propRelation = {'hashValue': relationHash}
+        propRelation = {key: value for key, value in propRelation.items() if value not in [None, []]}
+
+        r: RelationNeo4j = RelationNeo4j(category=InformationQuerryManager.__category, variable='r', toRight=True, **propRelation)
 
         p = PatternQuerry(fromNode, r , toNode)
-        return str(MatchQuerry(inputs=[p], outputs=[Variable('r')]))
+        return str(MatchQuerry(inputs=[p], outputs=[Variable('n1'),Variable('r'), Variable('n2')]))
 
     def getCreateQuerry(self) -> str:
 
